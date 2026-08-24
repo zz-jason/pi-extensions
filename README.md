@@ -40,9 +40,9 @@ The extension starts automatically and requires no configuration. It uses `ctx.u
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, quality checks, and the Conventional Commits policy. Pull requests must pass formatting, linting, type checking, unit tests with coverage, package validation, dependency review, CodeQL, and commit-message validation.
+See the [contributing guide](.github/CONTRIBUTING.md) for local setup, quality checks, and the Conventional Commits policy. Pull requests must pass formatting, linting, type checking, unit tests with coverage, package validation, dependency review, CodeQL, and commit-message validation.
 
-Pi extensions run with the current user's system permissions. Review the source before installation and report vulnerabilities according to [SECURITY.md](SECURITY.md).
+Pi extensions run with the current user's system permissions. Review the source before installation and follow the [security policy](.github/SECURITY.md) when reporting vulnerabilities.
 
 ## License
 
