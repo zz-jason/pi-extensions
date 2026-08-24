@@ -35,10 +35,14 @@ Restart pi after installation, or run `/reload` in an existing session.
 
 ## Included Extensions
 
-| Extension                                     | Description                                                                                                                                 |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`context-status`](extensions/context-status) | Shows the working directory, Git branch, proxy status, task duration, token usage, cost, model, and thinking level in a compact TUI footer. |
+| Extension                                          | Description                                                                                                                                                      |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`context-status`](extensions/context-status)      | Shows the working directory, Git branch, proxy status, task duration, token usage, cost, model, and thinking level in a compact TUI footer.                      |
+| [`auto-compact-70`](extensions/auto-compact-70.ts) | Compacts context after usage crosses 70%, provides `/compact70`, and resumes likely unfinished work without duplicating overflow recovery.                       |
+| [`response-style`](extensions/response-style.ts)   | Appends focused response guidance so the agent acts directly, avoids routine tool narration, leads with conclusions, and keeps ordinary final responses concise. |
 
 `context-status` replaces the complete default footer. Another extension that sets a custom footer may override it or be overridden by it. Proxy values are never displayed.
+
+`auto-compact-70` uses the active model's effective context window. Its continuation heuristic treats assistant turns ending in `toolUse` or `length` as potentially unfinished. Overflow recovery is left to pi's built-in retry path.
 
 Licensed under the [MIT License](LICENSE).
