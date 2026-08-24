@@ -27,13 +27,13 @@
     "node": ">=22.19.0"
   },
   "scripts": {
-    "commitlint": "commitlint",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
+    "commitlint": "commitlint --config config/commitlint.config.mjs",
+    "format": "prettier --config config/prettier.config.mjs --write .",
+    "format:check": "prettier --config config/prettier.config.mjs --check .",
+    "lint": "eslint --config config/eslint.config.mjs .",
+    "typecheck": "tsc --project config/tsconfig.json --noEmit",
+    "test": "vitest --config config/vitest.config.ts run",
+    "test:coverage": "vitest --config config/vitest.config.ts run --coverage",
     "package:check": "npm pack --dry-run",
     "validate": "npm run format:check && npm run lint && npm run typecheck && npm run test:coverage && npm run package:check"
   },
