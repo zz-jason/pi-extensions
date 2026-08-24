@@ -1,0 +1,29 @@
+{
+  "name": "@zz-jason/pi-extensions",
+  "version": "0.1.0",
+  "description": "A collection of practical extensions for pi",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zz-jason/pi-extensions.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zz-jason/pi-extensions/issues"
+  },
+  "homepage": "https://github.com/zz-jason/pi-extensions#readme",
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "pi-coding-agent"
+  ],
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*"
+  },
+  "pi": {
+    "extensions": [
+      "./extensions"
+    ]
+  }
+}
