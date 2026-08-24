@@ -1,5 +1,11 @@
 # pi-extensions
 
+[![CI](https://github.com/zz-jason/pi-extensions/actions/workflows/ci.yml/badge.svg)](https://github.com/zz-jason/pi-extensions/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/zz-jason/pi-extensions/actions/workflows/codeql.yml/badge.svg)](https://github.com/zz-jason/pi-extensions/actions/workflows/codeql.yml)
+[![Release](https://img.shields.io/github/v/release/zz-jason/pi-extensions)](https://github.com/zz-jason/pi-extensions/releases/latest)
+[![License](https://img.shields.io/github/license/zz-jason/pi-extensions)](LICENSE)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-FE5196?logo=conventionalcommits)](https://www.conventionalcommits.org/)
+
 `pi-extensions` is a collection of practical extensions for [pi](https://github.com/earendil-works/pi-mono). The project packages small terminal workflow improvements that are useful across repositories but do not belong in pi core.
 
 Pi is intentionally extensible: extensions can add tools, commands, lifecycle hooks, and custom TUI components without requiring changes to the main application. This repository provides a versioned, reviewable, and tested distribution channel for those additions, so users can install them without copying source files into their existing pi configuration.
