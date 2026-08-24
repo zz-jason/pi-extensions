@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/zz-jason/pi-extensions/actions/workflows/ci.yml/badge.svg)](https://github.com/zz-jason/pi-extensions/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/zz-jason/pi-extensions/actions/workflows/codeql.yml/badge.svg)](https://github.com/zz-jason/pi-extensions/actions/workflows/codeql.yml)
+[![Coverage](https://codecov.io/gh/zz-jason/pi-extensions/branch/main/graph/badge.svg)](https://codecov.io/gh/zz-jason/pi-extensions)
 [![Release](https://img.shields.io/github/v/release/zz-jason/pi-extensions)](https://github.com/zz-jason/pi-extensions/releases/latest)
 [![License](https://img.shields.io/github/license/zz-jason/pi-extensions)](LICENSE)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-FE5196?logo=conventionalcommits)](https://www.conventionalcommits.org/)
