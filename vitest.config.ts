@@ -4,8 +4,8 @@ export default defineConfig({
   test: {
     coverage: {
       provider: "v8",
-      include: ["extensions/context-status/utils.ts"],
-      reporter: ["text", "json-summary"],
+      include: ["extensions/**/*.ts"],
+      reporter: ["text", "json-summary", "lcov"],
       thresholds: {
         branches: 100,
         functions: 100,
