@@ -1,3 +1,16 @@
+export type GitChange = {
+  path: string;
+  status: string;
+};
+
+export type GitChangeSummary = {
+  added: number;
+  deleted: number;
+  modified: number;
+  renamed: number;
+  untracked: number;
+};
+
 export type ProxyLabel = {
   enabled: boolean;
   text: string;
@@ -16,10 +29,12 @@ export function formatDuration(ms: number): string {
   const hours = Math.floor(totalSeconds / 3_600);
   const minutes = Math.floor((totalSeconds % 3_600) / 60);
   const seconds = totalSeconds % 60;
-  const twoDigits = (value: number) => value.toString().padStart(2, "0");
+  const parts: string[] = [];
 
-  if (hours > 0) return `${hours}:${twoDigits(minutes)}:${twoDigits(seconds)}`;
-  return `${minutes}:${twoDigits(seconds)}`;
+  if (hours > 0) parts.push(`${hours}h`);
+  if (minutes > 0) parts.push(`${minutes}min`);
+  parts.push(`${seconds}s`);
+  return parts.join("");
 }
 
 export function compactPath(
@@ -32,6 +47,66 @@ export function compactPath(
   if (cwd === normalizedHome) return "~";
   if (cwd.startsWith(`${normalizedHome}/`)) return `~${cwd.slice(normalizedHome.length)}`;
   return cwd;
+}
+
+export function summarizeGitChanges(changes: GitChange[]): GitChangeSummary {
+  const summary: GitChangeSummary = {
+    added: 0,
+    deleted: 0,
+    modified: 0,
+    renamed: 0,
+    untracked: 0,
+  };
+
+  for (const change of changes) {
+    if (change.status === "??") {
+      summary.untracked += 1;
+      continue;
+    }
+    if (change.status.includes("R")) summary.renamed += 1;
+    else if (change.status.includes("A")) summary.added += 1;
+    else if (change.status.includes("D")) summary.deleted += 1;
+    else if (change.status.includes("M")) summary.modified += 1;
+  }
+
+  return summary;
+}
+
+export function formatGitChangeSummary(changes: GitChange[]): string {
+  if (changes.length === 0) return "clean";
+
+  const summary = summarizeGitChanges(changes);
+  const parts = (
+    [
+      [summary.modified, "modified"],
+      [summary.added, "added"],
+      [summary.deleted, "deleted"],
+      [summary.renamed, "renamed"],
+      [summary.untracked, "untracked"],
+    ] satisfies Array<[number, string]>
+  )
+    .filter(([count]) => count > 0)
+    .map(([count, label]) => `${count} ${label}`);
+
+  return parts.join(", ");
+}
+
+export function parseGitStatus(output: string): GitChange[] {
+  const records = output.split("\0");
+  const changes: GitChange[] = [];
+
+  for (let index = 0; index < records.length; index += 1) {
+    const record = records[index];
+    if (!record || record.length < 4) continue;
+
+    const status = record.slice(0, 2);
+    const path = record.slice(3);
+    changes.push({ path, status });
+
+    if (status.includes("R") || status.includes("C")) index += 1;
+  }
+
+  return changes;
 }
 
 export function getProxyLabel(env: NodeJS.ProcessEnv = process.env): ProxyLabel {
@@ -74,9 +149,9 @@ export class TaskTimer {
 
   getLabel(now = Date.now()): string {
     if (this.running && this.startedAt !== null) {
-      return `run:${formatDuration(now - this.startedAt)}`;
+      return `Elapsed: ${formatDuration(now - this.startedAt)}`;
     }
-    if (this.lastElapsedMs !== null) return `last:${formatDuration(this.lastElapsedMs)}`;
+    if (this.lastElapsedMs !== null) return `Last: ${formatDuration(this.lastElapsedMs)}`;
     return "ready";
   }
 }

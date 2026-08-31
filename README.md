@@ -37,11 +37,13 @@ Restart pi after installation, or run `/reload` in an existing session.
 
 | Extension                                          | Description                                                                                                                                                      |
 | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`context-status`](extensions/context-status)      | Shows the working directory, Git branch, proxy status, task duration, token usage, cost, model, and thinking level in a compact TUI footer.                      |
+| [`context-status`](extensions/context-status)      | Shows work dir, session name, model, thinking level, context window usage, and task elapsed time in a compact footer, with a centered context popup.             |
 | [`auto-compact-70`](extensions/auto-compact-70.ts) | Compacts context after usage crosses 70%, provides `/compact70`, and resumes likely unfinished work without duplicating overflow recovery.                       |
 | [`response-style`](extensions/response-style.ts)   | Appends focused response guidance so the agent acts directly, avoids routine tool narration, leads with conclusions, and keeps ordinary final responses concise. |
 
-`context-status` replaces the complete default footer. Another extension that sets a custom footer may override it or be overridden by it. Proxy values are never displayed.
+`context-status` replaces the complete default footer. Run `/info` to open a centered popup with the session name, working directory, Git branch, model, thinking level, context usage, task elapsed time, and changed files.
+
+The popup uses pi's overlay API and closes with `Esc`, `Ctrl+C`, or `Enter`. Another extension that sets a custom footer may override `context-status` or be overridden by it.
 
 `auto-compact-70` uses the active model's effective context window. Its continuation heuristic treats assistant turns ending in `toolUse` or `length` as potentially unfinished. Overflow recovery is left to pi's built-in retry path.
 
