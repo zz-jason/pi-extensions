@@ -4,21 +4,39 @@ updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
       day: monday
       time: "03:00"
       timezone: UTC
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 2
+    groups:
+      pi-packages:
+        patterns:
+          - "@earendil-works/pi-*"
+      dev-tooling:
+        dependency-type: development
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "@earendil-works/pi-*"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
     commit-message:
       prefix: "chore(deps)"
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
       day: monday
       time: "03:15"
       timezone: UTC
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 2
+    groups:
+      github-actions:
+        patterns:
+          - "*"
     commit-message:
       prefix: "ci(deps)"
