@@ -31,9 +31,10 @@ describe("context status utilities", () => {
     [-1_000, "0s"],
     [0, "0s"],
     [7_000, "7s"],
-    [65_000, "1min5s"],
-    [3_600_000, "1h0s"],
-    [3_661_000, "1h1min1s"],
+    [65_000, "1min 5s"],
+    [137_000, "2min 17s"],
+    [3_600_000, "1h 0s"],
+    [3_661_000, "1h 1min 1s"],
   ])("formats duration %i as %s", (value, expected) => {
     expect(formatDuration(value)).toBe(expected);
   });
@@ -112,12 +113,12 @@ describe("TaskTimer", () => {
     timer.start(1_000);
     timer.start(2_000);
     expect(timer.isRunning).toBe(true);
-    expect(timer.getLabel(66_000)).toBe("Elapsed: 1min5s");
+    expect(timer.getLabel(66_000)).toBe("Elapsed: 1min 5s");
 
     timer.stop(67_000);
     timer.stop(80_000);
     expect(timer.isRunning).toBe(false);
-    expect(timer.getLabel(90_000)).toBe("Last: 1min6s");
+    expect(timer.getLabel(90_000)).toBe("Last: 1min 6s");
   });
 
   it("never reports a negative elapsed duration", () => {
