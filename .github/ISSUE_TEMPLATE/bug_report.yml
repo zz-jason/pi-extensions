@@ -14,10 +14,10 @@ body:
     validations:
       required: true
   - type: input
-    id: extension-version
+    id: extension-ref
     attributes:
-      label: Extension version
-      placeholder: "v0.1.0"
+      label: Extension ref
+      placeholder: "main or commit SHA"
     validations:
       required: true
   - type: textarea
