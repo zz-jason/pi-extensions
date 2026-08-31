@@ -34,7 +34,7 @@ export function formatDuration(ms: number): string {
   if (hours > 0) parts.push(`${hours}h`);
   if (minutes > 0) parts.push(`${minutes}min`);
   parts.push(`${seconds}s`);
-  return parts.join("");
+  return parts.join(" ");
 }
 
 export function compactPath(
