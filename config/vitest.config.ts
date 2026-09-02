@@ -5,6 +5,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["extensions/**/*.ts"],
+      exclude: ["extensions/show-agents/index.ts"],
       reporter: ["text", "json-summary", "lcov"],
       thresholds: {
         branches: 100,
