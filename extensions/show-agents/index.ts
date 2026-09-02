@@ -32,6 +32,10 @@ type Snapshot = {
   error?: string;
 };
 
+type AgentTreeOptions = {
+  detachedRootSummaries?: ReadonlyMap<number, string>;
+};
+
 type ParsedCommand = {
   kind: AgentKind;
   binary: string;
@@ -246,12 +250,16 @@ function parsePsOutput(output: string): ProcessRow[] {
   return rows;
 }
 
-function makeAgentProcess(row: ProcessRow, parsed: ParsedCommand): AgentProcess {
+function makeAgentProcess(
+  row: ProcessRow,
+  parsed: ParsedCommand,
+  summaryOverride?: string,
+): AgentProcess {
   return {
     ...row,
     kind: parsed.kind,
     binary: parsed.binary,
-    summary: summarizeCommand(parsed),
+    summary: summaryOverride || summarizeCommand(parsed),
     parentPid: null,
     children: [],
   };
@@ -266,6 +274,84 @@ function isDescendant(pid: number, rootPid: number, byPid: Map<number, ProcessRo
     current = byPid.get(current.ppid);
   }
   return false;
+}
+
+function isDescendantOfAnyRoot(
+  pid: number,
+  rootPid: number,
+  byPid: Map<number, ProcessRow>,
+  detachedRootPids: ReadonlySet<number>,
+): boolean {
+  if (isDescendant(pid, rootPid, byPid) || detachedRootPids.has(pid)) return true;
+
+  const visited = new Set<number>();
+  let current = byPid.get(pid);
+  while (current && !visited.has(current.pid)) {
+    if (detachedRootPids.has(current.ppid)) return true;
+    visited.add(current.pid);
+    current = byPid.get(current.ppid);
+  }
+  return false;
+}
+
+function getSessionText(ctx: ExtensionContext): string {
+  const parts: string[] = [];
+  const entries = ctx.sessionManager.getBranch() as Array<{
+    message?: { content?: unknown };
+  }>;
+
+  const visit = (value: unknown): void => {
+    if (typeof value === "string") {
+      parts.push(value);
+      return;
+    }
+    if (Array.isArray(value)) {
+      for (const item of value) visit(item);
+      return;
+    }
+    if (!value || typeof value !== "object") return;
+    const record = value as Record<string, unknown>;
+    visit(record.content);
+    visit(record.message);
+    visit(record.text);
+    visit(record.command);
+    visit(record.arguments);
+    visit(record.output);
+  };
+
+  for (const entry of entries) visit(entry);
+  return parts.join("\n");
+}
+
+export function getDetachedRootSummaries(
+  rows: ProcessRow[],
+  rootPid: number,
+  sessionText: string,
+): Map<number, string> {
+  const candidates = new Map(
+    rows
+      .filter((row) => row.pid !== rootPid && row.ppid === 1 && detectCommand(row.command) !== null)
+      .map((row) => [row.pid, row]),
+  );
+  const summaries = new Map<number, string>();
+  const launchPattern =
+    /nohup\s+(?:env\s+)?(?:pi|codex(?:-cli)?|claude(?:-code)?|opencode|aider|goose|gemini)\s+-p\s+(['"])([\s\S]*?)\1\s+[^\n]*&\s*echo\s+\$!/gim;
+  const matches = [...sessionText.matchAll(launchPattern)];
+
+  for (let index = 0; index < matches.length; index += 1) {
+    const match = matches[index]!;
+    const launchEnd = (match.index ?? 0) + match[0].length;
+    const nextLaunch = matches[index + 1]?.index ?? sessionText.length;
+    const outputWindow = sessionText.slice(launchEnd, Math.min(nextLaunch, launchEnd + 2_000));
+    const pidMatch = outputWindow.match(/(?:^|\n)\s*(\d{2,})\s*(?:\n|$)/);
+    const pid = pidMatch?.[1] ? Number(pidMatch[1]) : NaN;
+    const prompt = match[2]?.trim();
+    if (!prompt || !Number.isSafeInteger(pid) || !candidates.has(pid)) continue;
+
+    summaries.set(pid, shortenSummary(prompt.split(/[。\n]/, 1)[0] || prompt));
+  }
+
+  return summaries;
 }
 
 function getRootSummary(ctx: ExtensionContext): string {
@@ -294,8 +380,15 @@ function getRootSummary(ctx: ExtensionContext): string {
   return "current pi session (task unavailable)";
 }
 
-export function buildAgentTree(rows: ProcessRow[], rootPid: number, rootSummary: string): Snapshot {
+export function buildAgentTree(
+  rows: ProcessRow[],
+  rootPid: number,
+  rootSummary: string,
+  options: AgentTreeOptions = {},
+): Snapshot {
   const byPid = new Map(rows.map((row) => [row.pid, row]));
+  const detachedRootSummaries = options.detachedRootSummaries ?? new Map<number, string>();
+  const detachedRootPids = new Set(detachedRootSummaries.keys());
   const rootRow = byPid.get(rootPid) ?? {
     pid: rootPid,
     ppid: 0,
@@ -314,21 +407,27 @@ export function buildAgentTree(rows: ProcessRow[], rootPid: number, rootSummary:
 
   const visible = new Map<number, AgentProcess>([[rootPid, root]]);
   for (const row of rows) {
-    if (row.pid === rootPid || !isDescendant(row.pid, rootPid, byPid)) continue;
+    if (row.pid === rootPid || !isDescendantOfAnyRoot(row.pid, rootPid, byPid, detachedRootPids))
+      continue;
     const parsed = detectCommand(row.command);
     if (!parsed) continue;
-    visible.set(row.pid, makeAgentProcess(row, parsed));
+    visible.set(row.pid, makeAgentProcess(row, parsed, detachedRootSummaries.get(row.pid)));
   }
 
   for (const agent of visible.values()) {
     if (agent.pid === rootPid) continue;
-    let ancestor = byPid.get(agent.ppid);
-    const visited = new Set<number>();
-    while (ancestor && !visible.has(ancestor.pid) && !visited.has(ancestor.pid)) {
-      visited.add(ancestor.pid);
-      ancestor = byPid.get(ancestor.ppid);
+    let parent: AgentProcess | undefined;
+    if (detachedRootPids.has(agent.pid)) {
+      parent = root;
+    } else {
+      let ancestor = byPid.get(agent.ppid);
+      const visited = new Set<number>();
+      while (ancestor && !visible.has(ancestor.pid) && !visited.has(ancestor.pid)) {
+        visited.add(ancestor.pid);
+        ancestor = byPid.get(ancestor.ppid);
+      }
+      parent = ancestor && visible.get(ancestor.pid);
     }
-    const parent = ancestor && visible.get(ancestor.pid);
     if (parent) {
       agent.parentPid = parent.pid;
       parent.children.push(agent);
@@ -480,7 +579,9 @@ async function readSnapshot(
         error: result.stderr.trim() || `ps exited with code ${result.code}`,
       };
     }
-    return buildAgentTree(parsePsOutput(result.stdout), rootPid, rootSummary);
+    const rows = parsePsOutput(result.stdout);
+    const detachedRootSummaries = getDetachedRootSummaries(rows, rootPid, getSessionText(ctx));
+    return buildAgentTree(rows, rootPid, rootSummary, { detachedRootSummaries });
   } catch (error) {
     return {
       rootPid,
