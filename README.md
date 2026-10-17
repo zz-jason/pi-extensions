@@ -32,11 +32,11 @@ Restart pi after installation, or run `/reload` in an existing session.
 
 ## Extensions
 
-| Extension                                          | Description                                                                                                                        | Commands / UX                                  |
-| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| [`context-status`](extensions/context-status)      | Replaces the default footer with compact work dir, session, task, context usage, model, and thinking information.                  | Footer plus `/info` centered context popup.    |
-| [`show-agents`](extensions/show-agents/index.ts)   | Displays the current pi-rooted recursive process tree, keeping only detected coding-agent processes such as pi, codex, and claude. | `/show-agents` centered live popup.            |
-| [`auto-compact-70`](extensions/auto-compact-70.ts) | Compacts context after usage crosses 70% and resumes likely unfinished work without duplicating pi's built-in overflow recovery.   | Automatic compaction plus `/compact70`.        |
+| Extension                                          | Description                                                                                                                        | Commands / UX                               |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| [`context-status`](extensions/context-status)      | Replaces the default footer with compact work dir, session, task, context usage, model, and thinking information.                  | Footer plus `/info` centered context popup. |
+| [`show-agents`](extensions/show-agents/index.ts)   | Displays the current pi-rooted recursive process tree, keeping only detected coding-agent processes such as pi, codex, and claude. | `/show-agents` centered live popup.         |
+| [`auto-compact-70`](extensions/auto-compact-70.ts) | Compacts context after usage crosses 70% and resumes likely unfinished work without duplicating pi's built-in overflow recovery.   | Automatic compaction plus `/compact70`.     |
 
 Footer example:
 
