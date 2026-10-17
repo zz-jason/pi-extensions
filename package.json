@@ -60,7 +60,6 @@
   "pi": {
     "extensions": [
       "./extensions/context-status/index.ts",
-      "./extensions/show-agents/index.ts",
       "./extensions/auto-compact-70.ts"
     ]
   }

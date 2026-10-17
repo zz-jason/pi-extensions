@@ -10,9 +10,7 @@ Practical extensions for the [pi coding agent](https://github.com/earendil-works
 
 - Compact context footer with session, model, thinking, and usage status.
 - Rich `/info` popup for session, Git, model, and runtime context.
-- `/show-agents` popup for the recursive macOS/Linux coding-agent process tree.
 - Automatic context compaction after usage crosses 70%.
-- Concise response style guidance for everyday coding sessions.
 
 ## Quick Start
 
@@ -32,11 +30,10 @@ Restart pi after installation, or run `/reload` in an existing session.
 
 ## Extensions
 
-| Extension                                          | Description                                                                                                                        | Commands / UX                               |
-| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| [`context-status`](extensions/context-status)      | Replaces the default footer with compact work dir, session, task, context usage, model, and thinking information.                  | Footer plus `/info` centered context popup. |
-| [`show-agents`](extensions/show-agents/index.ts)   | Displays the current pi-rooted recursive process tree, keeping only detected coding-agent processes such as pi, codex, and claude. | `/show-agents` centered live popup.         |
-| [`auto-compact-70`](extensions/auto-compact-70.ts) | Compacts context after usage crosses 70% and resumes likely unfinished work without duplicating pi's built-in overflow recovery.   | Automatic compaction plus `/compact70`.     |
+| Extension                                          | Description                                                                                                                      | Commands / UX                               |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| [`context-status`](extensions/context-status)      | Replaces the default footer with compact work dir, session, task, context usage, model, and thinking information.                | Footer plus `/info` centered context popup. |
+| [`auto-compact-70`](extensions/auto-compact-70.ts) | Compacts context after usage crosses 70% and resumes likely unfinished work without duplicating pi's built-in overflow recovery. | Automatic compaction plus `/compact70`.     |
 
 Footer example:
 
@@ -53,11 +50,7 @@ The package declares its extensions in `package.json`:
 ```json
 {
   "pi": {
-    "extensions": [
-      "./extensions/context-status/index.ts",
-      "./extensions/show-agents/index.ts",
-      "./extensions/auto-compact-70.ts"
-    ]
+    "extensions": ["./extensions/context-status/index.ts", "./extensions/auto-compact-70.ts"]
   }
 }
 ```
